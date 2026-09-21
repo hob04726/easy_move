@@ -7,16 +7,9 @@ import "core:math"
 
 movable_blocks : [dynamic]data.Vector2i
 
-Move_Direciton :: enum{
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
-}
-
 update :: proc(dt: f32){
     switch{
-    case rl.IsKeyPressed(.LEFT ):
+    case rl.IsKeyPressed(.LEFT):
         fmt.println("move to left")
         get_all_movable_blocks(.LEFT)
         update_all_movable_blocks(.LEFT)
@@ -24,17 +17,15 @@ update :: proc(dt: f32){
         fmt.println("move to right")
         get_all_movable_blocks(.RIGHT)
         update_all_movable_blocks(.RIGHT)
-    case rl.IsKeyPressed(.UP   ):
+    case rl.IsKeyPressed(.UP):
         fmt.println("move to up")
         get_all_movable_blocks(.UP)
         update_all_movable_blocks(.UP)
-    case rl.IsKeyPressed(.DOWN ):
+    case rl.IsKeyPressed(.DOWN):
         fmt.println("move to down")
         get_all_movable_blocks(.DOWN)
         update_all_movable_blocks(.DOWN)
         }
-
-
     }
 
 is_in_bounds :: proc(grid: [dynamic][dynamic] $T, r: int, c: int) -> bool {
@@ -43,12 +34,12 @@ is_in_bounds :: proc(grid: [dynamic][dynamic] $T, r: int, c: int) -> bool {
     return true
 }
 
-get_all_movable_blocks :: proc(move_direction: Move_Direciton){
+get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
     clear(&movable_blocks)
     for raw, i in data.runtime_scene.blocks{
         for grid, j in raw{
             if grid == "Player"{
-                switch move_direction{
+                #partial switch move_direction{
                 case .LEFT:
                     if is_in_bounds(data.runtime_scene.blocks, i, j-1) &&
                     data.runtime_scene.ground[i][j-1] == "Ground" &&
@@ -125,8 +116,8 @@ try_move_block :: proc(
 
 
 
-update_all_movable_blocks :: proc(move_direction: Move_Direciton){
-    switch move_direction{
+update_all_movable_blocks :: proc(move_direction: data.Move_Direction){
+    #partial switch move_direction{
     case .LEFT:
         for grid_position in movable_blocks{
             try_move_block(grid_position, data.Vector2i{ 0, -1})

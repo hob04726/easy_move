@@ -5,36 +5,25 @@ import "core:fmt"
 import "core:strings"
 import "../data"
 
-@(private)
 draw_window_scale : f32 = 0.309
-@(private)
 normal_font : rl.Font
 
-@(private)
 draw_window_length : f32
-@(private)
 row_length    : int
-@(private)
 column_length : int
 
-@(private)
 grid_step_length  : f32
 
-@(private)
 left_offset  : f32
-@(private)
 above_offset : f32
 
-@(private)
 text_size : f32
-@(private)
 between_margin : f32
 
 set_default_variables :: proc(){
     // @Incompleted: use font to draw the number.
     // normal_font := rl.LoadFont("assets/fonts/OpenSans-Regular.ttf")
     // rl.UnloadFont(normal_font)
-
 
     draw_window_length = f32( min(rl.GetScreenWidth(), rl.GetScreenHeight()) ) * draw_window_scale
     row_length = len(data.runtime_scene.ground[0])
@@ -124,7 +113,7 @@ draw_scene :: proc(){
                         rl.MeasureTextEx(rl.GetFontDefault(), grid_text, text_size, between_margin).x / 2,
                         rl.MeasureTextEx(rl.GetFontDefault(), grid_text, text_size, between_margin).y / 2
                     },
-                    0, text_size, between_margin, rl.Color{255, 255, 255,  0})
+                    0, text_size, between_margin, rl.Color{255, 255, 255,   0})
 
             case "Player":
                 rl.DrawTextPro(rl.GetFontDefault(),

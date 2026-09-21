@@ -16,12 +16,41 @@ Scene :: struct {
     profile_blocks : [][]string
 }
 
+Memery_Buffers :: struct{
+    current_buffer_id : int,
+    memery_scene_blocks : [dynamic][dynamic][dynamic]string,
+    memery_scene_ground : [dynamic][dynamic][dynamic]string,
+    memery_command : [dynamic]Move_Direction
+}
+
+Move_Direction :: enum{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    NONE
+}
+
+current_memery_buffers : Memery_Buffers
+
 clone_2d_dynamic :: proc(src: [][] $T) -> [dynamic][dynamic]T {
     grid := make([dynamic][dynamic]T, len(src))
     for row, i in src {
         grid[i] = slice.clone_to_dynamic(row)
     }
     return grid
+}
+
+clone_2d_from_dynamic :: proc(
+    src: [dynamic][dynamic]$T,
+) -> [dynamic][dynamic]T {
+    result := make([dynamic][dynamic]T, len(src))
+
+    for row, i in src {
+        result[i] = slice.clone_to_dynamic(row[:])
+    }
+
+    return result
 }
 
 delete_2d_dynamic :: proc(grid: [dynamic][dynamic] $T) {
@@ -47,11 +76,21 @@ runtime_scene : Runtime_Scene
 init_scene :: proc(){
     runtime_scene.ground = clone_2d_dynamic(scenes_list[current_scene_id].profile_ground)
     runtime_scene.blocks = clone_2d_dynamic(scenes_list[current_scene_id].profile_blocks)
+    append(&current_memery_buffers.memery_scene_blocks, clone_2d_from_dynamic(runtime_scene.blocks))
+    append(&current_memery_buffers.memery_scene_ground, clone_2d_from_dynamic(runtime_scene.ground))
+    current_memery_buffers.current_buffer_id = 0
+    append(&current_memery_buffers.memery_command, Move_Direction.NONE)
 }
 
 release_scene :: proc(){
     delete_2d_dynamic(runtime_scene.ground)
     delete_2d_dynamic(runtime_scene.blocks)
+    for buffer in current_memery_buffers.memery_scene_blocks{
+        delete_2d_dynamic(buffer)
+    }
+    for buffer in current_memery_buffers.memery_scene_ground{
+        delete_2d_dynamic(buffer)
+    }
 }
 
 //
