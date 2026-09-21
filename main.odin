@@ -4,6 +4,7 @@ import rl "vendor:raylib"
 import "core:fmt"
 import "draw"
 import "game"
+import "data"
 
 SCREEN_WIDTH  :: 600
 SCREEN_HEIGHT :: 600
@@ -14,11 +15,14 @@ main :: proc() {
     rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "easy move!")
     rl.SetWindowMinSize(600, 600)
 
-    rl.SetTargetFPS(240)
+    rl.SetTargetFPS(60)
     // rl.HideCursor()
 
     draw.load_fonts()
     defer draw.unload_fonts()
+
+
+    data.init_scene()
 
     for !rl.WindowShouldClose() {
 
@@ -35,6 +39,8 @@ main :: proc() {
 
         rl.EndDrawing()
     }
+
+    data.release_scene()
 
     rl.CloseWindow()
 }

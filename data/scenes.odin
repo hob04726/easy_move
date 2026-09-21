@@ -6,6 +6,11 @@ import "core:slice"
 //
 current_scene_id : int = 0
 
+Vector2i :: struct {
+    x : int,
+    y : int
+}
+
 Scene :: struct {
     profile_ground : [][]string,
     profile_blocks : [][]string
@@ -27,7 +32,9 @@ delete_2d_dynamic :: proc(grid: [dynamic][dynamic] $T) {
 }
 
 switch_to_scene :: proc(scene_id: int){
-   current_scene_id = scene_id
+    current_scene_id = scene_id
+    release_scene()
+    init_scene()
 }
 
 Runtime_Scene :: struct {
@@ -56,13 +63,13 @@ scenes_list := []Scene {
 
 hello_page_scene : Scene = {
     {
-        {"0", "Door", "0"},
-        {"0", "0", "0"},
-        {"0", "0", "0"}
+        {"Ground", "Door"  , "Ground"},
+        {"Ground", "Ground", "Ground"},
+        {"Ground", "Ground", "Empty" }
     },
     {
-        {"0", "0", "0"},
-        {"0", "0", "0"},
-        {"0", "Player", "0"}
+        {"Player", "Empty" , "Empty" },
+        {"Empty" , "Empty" , "Empty" },
+        {"Empty" , "Player", "Empty" }
     }
 }
