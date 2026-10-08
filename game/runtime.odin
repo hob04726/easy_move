@@ -5,26 +5,20 @@ import "../data"
 import "core:fmt"
 import "core:math"
 
-movable_blocks : [dynamic]data.Vector2i
-
 update :: proc(dt: f32){
     switch{
     case rl.IsKeyPressed(.LEFT):
         fmt.println("move to left")
         get_all_movable_blocks(.LEFT)
-        update_all_movable_blocks(.LEFT)
     case rl.IsKeyPressed(.RIGHT):
         fmt.println("move to right")
         get_all_movable_blocks(.RIGHT)
-        update_all_movable_blocks(.RIGHT)
     case rl.IsKeyPressed(.UP):
         fmt.println("move to up")
         get_all_movable_blocks(.UP)
-        update_all_movable_blocks(.UP)
     case rl.IsKeyPressed(.DOWN):
         fmt.println("move to down")
         get_all_movable_blocks(.DOWN)
-        update_all_movable_blocks(.DOWN)
         }
     }
 
@@ -35,43 +29,69 @@ is_in_bounds :: proc(grid: [dynamic][dynamic] $T, r: int, c: int) -> bool {
 }
 
 get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
-    clear(&movable_blocks)
-    for raw, i in data.runtime_scene.blocks{
-        for grid, j in raw{
-            if grid == "Player"{
-                #partial switch move_direction{
-                case .LEFT:
+    #partial switch move_direction{
+    case .LEFT:
+        for raw, i in data.runtime_scene.blocks{
+            for grid, j in raw{
+                if grid == "Player"{
+
                     if is_in_bounds(data.runtime_scene.blocks, i, j-1) &&
                     data.runtime_scene.ground[i][j-1] == "Ground" &&
                     data.runtime_scene.blocks[i][j-1] == "Empty"{
-                        append(&movable_blocks, data.Vector2i{i, j})
-                    }
-                case .RIGHT:
-                    if is_in_bounds(data.runtime_scene.blocks, i, j+1) &&
-                    data.runtime_scene.ground[i][j+1] == "Ground" &&
-                    data.runtime_scene.blocks[i][j+1] == "Empty"{
-                        append(&movable_blocks, data.Vector2i{i, j})
-                    }
-                case .UP:
-                    if is_in_bounds(data.runtime_scene.blocks, i-1, j) &&
-                    data.runtime_scene.ground[i-1][j] == "Ground" &&
-                    data.runtime_scene.blocks[i-1][j] == "Empty"{
-                        append(&movable_blocks, data.Vector2i{i, j})
-                    }
-                case .DOWN:
-                    if is_in_bounds(data.runtime_scene.blocks, i+1, j) &&
-                    data.runtime_scene.ground[i+1][j] == "Ground" &&
-                    data.runtime_scene.blocks[i+1][j] == "Empty"{
-                        append(&movable_blocks, data.Vector2i{i, j})
+                        try_move_block(data.Vector2i{i, j}, data.Vector2i{ 0, -1})
                     }
                 }
             }
-            // @Incompleted: other class to choose in here.
         }
+    case .RIGHT:
+        for raw, i in data.runtime_scene.blocks{
+            #reverse for grid, j in raw{
+                if grid == "Player"{
+
+                    if is_in_bounds(data.runtime_scene.blocks, i, j+1) &&
+                    data.runtime_scene.ground[i][j+1] == "Ground" &&
+                    data.runtime_scene.blocks[i][j+1] == "Empty"{
+                        try_move_block(data.Vector2i{i, j}, data.Vector2i{ 0,  1})
+                    }
+                }
+            }
+        }
+    case .UP:
+        for raw, i in data.runtime_scene.blocks{
+            for grid, j in raw{
+                if grid == "Player"{
+
+                    if is_in_bounds(data.runtime_scene.blocks, i-1, j) &&
+                    data.runtime_scene.ground[i-1][j] == "Ground" &&
+                    data.runtime_scene.blocks[i-1][j] == "Empty"{
+                        try_move_block(data.Vector2i{i, j}, data.Vector2i{-1,  0})
+                    }
+                }
+            }
+        }
+    case .DOWN:
+        #reverse for raw, i in data.runtime_scene.blocks{
+            for grid, j in raw{
+                if grid == "Player"{
+
+                    if is_in_bounds(data.runtime_scene.blocks, i+1, j) &&
+                    data.runtime_scene.ground[i+1][j] == "Ground" &&
+                    data.runtime_scene.blocks[i+1][j] == "Empty"{
+                        try_move_block(data.Vector2i{i, j}, data.Vector2i{ 1,  0})
+                    }
+                }
+            }
+        }
+        // @Incompleted: other class to choose in here.
     }
-    for position in movable_blocks{
-        fmt.println("x=", position.x, "y=", position.y)
-    }
+    append(
+        &data.memery_buffer_list, data.Memery_Buffer{
+            buffer_id = data.current_memery_buffer_id + 1,
+            memery_scene_blocks = data.clone_2d_from_dynamic(data.runtime_scene.blocks),
+            memery_scene_ground = data.clone_2d_from_dynamic(data.runtime_scene.ground),
+            move_command = data.Move_Direction.NONE,
+        }
+    )
 }
 
 do_one_move :: proc(position: data.Vector2i, target_position: data.Vector2i, is_block: bool){
@@ -116,23 +136,23 @@ try_move_block :: proc(
 
 
 
-update_all_movable_blocks :: proc(move_direction: data.Move_Direction){
-    #partial switch move_direction{
-    case .LEFT:
-        for grid_position in movable_blocks{
-            try_move_block(grid_position, data.Vector2i{ 0, -1})
-        }
-    case .RIGHT:
-        for grid_position in movable_blocks{
-            try_move_block(grid_position, data.Vector2i{ 0,  1})
-        }
-    case .UP:
-        for grid_position in movable_blocks{
-            try_move_block(grid_position, data.Vector2i{-1,  0})
-        }
-    case .DOWN:
-        for grid_position in movable_blocks{
-            try_move_block(grid_position, data.Vector2i{ 1,  0})
-        }
-    }
-}
+// update_all_movable_blocks :: proc(move_direction: data.Move_Direction){
+//     #partial switch move_direction{
+//     case .LEFT:
+//         for grid_position in movable_blocks{
+//             try_move_block(grid_position, data.Vector2i{ 0, -1})
+//         }
+//     case .RIGHT:
+//         for grid_position in movable_blocks{
+//             try_move_block(grid_position, data.Vector2i{ 0,  1})
+//         }
+//     case .UP:
+//         for grid_position in movable_blocks{
+//             try_move_block(grid_position, data.Vector2i{-1,  0})
+//         }
+//     case .DOWN:
+//         for grid_position in movable_blocks{
+//             try_move_block(grid_position, data.Vector2i{ 1,  0})
+//         }
+//     }
+// }
