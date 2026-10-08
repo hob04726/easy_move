@@ -19,6 +19,24 @@ update :: proc(dt: f32){
     case rl.IsKeyPressed(.DOWN):
         fmt.println("move to down")
         get_all_movable_blocks(.DOWN)
+    case rl.IsKeyPressed(.A):
+        fmt.println("move to left")
+        get_all_movable_blocks(.LEFT)
+    case rl.IsKeyPressed(.D):
+        fmt.println("move to right")
+        get_all_movable_blocks(.RIGHT)
+    case rl.IsKeyPressed(.W):
+        fmt.println("move to up")
+        get_all_movable_blocks(.UP)
+    case rl.IsKeyPressed(.S):
+        fmt.println("move to down")
+        get_all_movable_blocks(.DOWN)
+    case rl.IsKeyPressed(.U):
+        fmt.println("Undo")
+        //@Incompleted: We need to take the memery buffer out here.
+    case rl.IsKeyPressed(.R):
+        fmt.println("Redo")
+        //@Incompleted: We need to take the scene out here.
         }
     }
 
@@ -47,7 +65,6 @@ get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
         for raw, i in data.runtime_scene.blocks{
             #reverse for grid, j in raw{
                 if grid == "Player"{
-
                     if is_in_bounds(data.runtime_scene.blocks, i, j+1) &&
                     data.runtime_scene.ground[i][j+1] == "Ground" &&
                     data.runtime_scene.blocks[i][j+1] == "Empty"{
@@ -60,7 +77,6 @@ get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
         for raw, i in data.runtime_scene.blocks{
             for grid, j in raw{
                 if grid == "Player"{
-
                     if is_in_bounds(data.runtime_scene.blocks, i-1, j) &&
                     data.runtime_scene.ground[i-1][j] == "Ground" &&
                     data.runtime_scene.blocks[i-1][j] == "Empty"{
@@ -73,7 +89,6 @@ get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
         #reverse for raw, i in data.runtime_scene.blocks{
             for grid, j in raw{
                 if grid == "Player"{
-
                     if is_in_bounds(data.runtime_scene.blocks, i+1, j) &&
                     data.runtime_scene.ground[i+1][j] == "Ground" &&
                     data.runtime_scene.blocks[i+1][j] == "Empty"{
@@ -82,6 +97,7 @@ get_all_movable_blocks :: proc(move_direction: data.Move_Direction){
                 }
             }
         }
+    case .NONE:
         // @Incompleted: other class to choose in here.
     }
     append(
